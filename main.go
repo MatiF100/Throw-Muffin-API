@@ -66,5 +66,5 @@ func main() {
 		port = "8080"
 	}
 
-	router.Run("127.0.0.1:" + port)
+	router.Run("0.0.0.0:" + port)
 }
