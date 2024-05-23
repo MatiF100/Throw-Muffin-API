@@ -1,16 +1,63 @@
 package main
 
 import (
+	"context"
 	"fmt"
+	"log"
 	"net/http"
 	"os"
 	"strings"
 
+	"github.com/MatiF100/Throw-Muffin-API/ent"
 	"github.com/gin-gonic/gin"
 	"gopkg.in/fsnotify.v1"
+
+	"github.com/gofor-little/env"
+
+	_ "github.com/lib/pq"
 )
 
+type App struct {
+	client     *ent.Client
+	local_mode bool
+}
+
 func main() {
+	app := App{}
+	setup_env(&app)
+	setup_db(&app)
+	defer app.client.Close()
+
+	run_server()
+}
+
+func setup_env(app *App) {
+	if err := env.Load(".env"); err != nil {
+		log.Println("Failed to locate .env file. Using system variables and/or defaults")
+		app.local_mode = true
+	}
+}
+
+func setup_db(app *App) {
+	dbString := env.Get("dbString", fmt.Sprintf("host=localhost port=5432 user=postgres dbname=postgres password=postgres sslmode=disable"))
+	client, err := ent.Open("postgres", dbString)
+	if err != nil {
+		log.Fatalf("failed opening connection to postgres: %v", err)
+	}
+	// Run the auto migration tool.
+	if err := client.Schema.Create(context.Background()); err != nil {
+		log.Fatalf("failed creating schema resources: %v", err)
+	}
+
+	app.client = client
+
+}
+
+func run_server() {
+	old_main()
+}
+
+func old_main() {
 	router := gin.Default()
 
 	router.LoadHTMLGlob("templates/*")
