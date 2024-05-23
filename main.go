@@ -42,11 +42,11 @@ func setup_db(app *App) {
 	dbString := env.Get("dbString", fmt.Sprintf("host=localhost port=5432 user=postgres dbname=postgres password=postgres sslmode=disable"))
 	client, err := ent.Open("postgres", dbString)
 	if err != nil {
-		log.Fatalf("failed opening connection to postgres: %v", err)
+		log.Println("failed opening connection to postgres: %v", err)
 	}
 	// Run the auto migration tool.
 	if err := client.Schema.Create(context.Background()); err != nil {
-		log.Fatalf("failed creating schema resources: %v", err)
+		log.Println("failed creating schema resources: %v", err)
 	}
 
 	app.client = client
