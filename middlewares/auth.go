@@ -1,7 +1,7 @@
 package middlewares
 
 import (
-	"github.com/MatiF100/Throw-Muffin-Api/auth"
+	"github.com/MatiF100/Throw-Muffin-API/auth"
 	"github.com/gin-gonic/gin"
 )
 

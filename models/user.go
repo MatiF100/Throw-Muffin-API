@@ -1,7 +1,7 @@
 package models
 
 import (
-	"github.com/MatiF100/Throw-Muffin-Api/internal/binary_uuid"
+	"github.com/MatiF100/Throw-Muffin-API/internal/binary_uuid"
 	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
