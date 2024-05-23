@@ -39,4 +39,5 @@ jobs:
         package: build/
         publish-profile: ${{ secrets.azureWebAppPublishProfile }}
       env:
-        db-string: ${{ secrets.dbString }}
+        dbString: ${{ secrets.dbString }}
+        TOKEN_SECRET: ${{ secrets.jwtToken }}
