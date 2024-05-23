@@ -26,6 +26,7 @@ func main() {
 	var app App = App{}
 
 	setup_env(&app)
+	setup_db(&app)
 	setup_azure(&app)
 
 	router := initRouter()

@@ -1,7 +1,6 @@
 package models
 
 import (
-	"github.com/MatiF100/Throw-Muffin-API/internal/binary_uuid"
 	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
@@ -9,12 +8,12 @@ import (
 
 type BaseModel struct {
 	gorm.Model
-	ID binary_uuid.BinaryUUID `gorm:"primary_key;type:uuid" json:"id"`
+	ID uuid.UUID `gorm:"primary_key;type:uuid;default:uuid_generate_v4()" json:"id"`
 }
 
 func (base *BaseModel) BeforeCreate(tx *gorm.DB) (err error) {
 	uuid, err := uuid.NewRandom()
-	base.ID = binary_uuid.BinaryUUID(uuid)
+	base.ID = uuid
 
 	return err
 }
