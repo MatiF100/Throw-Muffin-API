@@ -1,14 +1,14 @@
 package main
 
 import (
-	"context"
 	"fmt"
 	"log"
-	"net/http"
 	"os"
 	"strings"
 
-	"github.com/MatiF100/Throw-Muffin-API/ent"
+	"github.com/MatiF100/Throw-Muffin-API/controllers"
+	"github.com/MatiF100/Throw-Muffin-API/database"
+	"github.com/MatiF100/Throw-Muffin-API/middlewares"
 	"github.com/gin-gonic/gin"
 	"gopkg.in/fsnotify.v1"
 
@@ -18,17 +18,40 @@ import (
 )
 
 type App struct {
-	client     *ent.Client
+	port       string
 	local_mode bool
 }
 
 func main() {
-	app := App{}
-	setup_env(&app)
-	setup_db(&app)
-	defer app.client.Close()
+	var app App = App{}
 
-	run_server()
+	setup_env(&app)
+	setup_azure(&app)
+
+	router := initRouter()
+
+	router.Run(":8080")
+}
+
+func initRouter() *gin.Engine {
+	router := gin.Default()
+
+	api := router.Group("/api/v1")
+	{
+		auth := api.Group("/auth")
+		{
+			auth.POST("/login", controllers.GenerateToken)
+			auth.POST("/register", controllers.RegisterUser)
+			auth.POST("/refresh-token", controllers.RefreshToken)
+		}
+
+		secured := api.Group("").Use(middlewares.Auth())
+		{
+			secured.GET("/ping", controllers.Ping)
+		}
+	}
+
+	return router
 }
 
 func setup_env(app *App) {
@@ -40,42 +63,12 @@ func setup_env(app *App) {
 
 func setup_db(app *App) {
 	dbString := env.Get("dbString", fmt.Sprintf("host=localhost port=5432 user=postgres dbname=postgres password=postgres sslmode=disable"))
-	client, err := ent.Open("postgres", dbString)
-	if err != nil {
-		log.Printf("failed opening connection to postgres: %v", err)
-	}
-	// Run the auto migration tool.
-	if err := client.Schema.Create(context.Background()); err != nil {
-		log.Printf("failed creating schema resources: %v", err)
-	}
 
-	app.client = client
-
+	database.Connect(dbString)
+	database.Migrate()
 }
 
-func run_server() {
-	old_main()
-}
-
-func old_main() {
-	router := gin.Default()
-
-	router.LoadHTMLGlob("templates/*")
-	router.GET("/", func(ctx *gin.Context) {
-		ctx.HTML(http.StatusOK, "index.tmpl", gin.H{
-			"title": "Hello from Go and Gin running on Azure App Service",
-			"link":  "/json",
-		})
-	})
-
-	router.GET("/json", func(ctx *gin.Context) {
-		ctx.JSON(http.StatusOK, gin.H{
-			"foo": "bar",
-		})
-	})
-
-	router.Static("/public", "./public")
-
+func setup_azure(app *App) {
 	// creates a new file watcher for App_offline.htm
 	watcher, err := fsnotify.NewWatcher()
 	if err != nil {
@@ -113,5 +106,5 @@ func old_main() {
 		port = "8080"
 	}
 
-	router.Run("0.0.0.0:" + port)
+	app.port = port
 }
