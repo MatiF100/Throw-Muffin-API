@@ -5,9 +5,10 @@ import (
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
+	"github.com/gofor-little/env"
 )
 
-var jwtKey = []byte("my_secret_key")
+var jwtKey = []byte(env.Get("SECRET_TOKEN", "someHiddenJwtToken"))
 
 type JWTClaim struct {
 	Username string `json:"username"`

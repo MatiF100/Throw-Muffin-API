@@ -26,6 +26,6 @@ func Connect(connectionString string) {
 }
 
 func Migrate() {
-	Instance.AutoMigrate(&models.User{})
+	Instance.AutoMigrate(&models.User{}, &models.BodyPart{}, &models.Excercise{})
 	log.Println("Database migrated")
 }
