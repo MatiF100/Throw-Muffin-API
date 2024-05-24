@@ -27,8 +27,8 @@ func main() {
 
 	log.Println("Test log")
 
-	setup_env(&app)
-	setup_db(&app)
+	//setup_env(&app)
+	//setup_db(&app)
 	setup_azure(&app)
 
 	router := initRouter()
