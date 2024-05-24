@@ -25,6 +25,8 @@ type App struct {
 func main() {
 	var app App = App{}
 
+	log.Println("Test log")
+
 	setup_env(&app)
 	setup_db(&app)
 	setup_azure(&app)
