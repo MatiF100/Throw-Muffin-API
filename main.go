@@ -27,13 +27,13 @@ func main() {
 
 	log.Println("Test log")
 
-	//setup_env(&app)
-	//setup_db(&app)
+	setup_env(&app)
+	setup_db(&app)
 	setup_azure(&app)
 
 	router := initRouter()
 
-	router.Run("0.0.0.0:8080")
+	router.Run("0.0.0.0:" + app.port)
 }
 
 func Ping(context *gin.Context) {
