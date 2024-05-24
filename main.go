@@ -34,11 +34,16 @@ func main() {
 	router.Run(":8080")
 }
 
+func Ping(context *gin.Context) {
+	context.JSON(200, gin.H{"message": "2137pong"})
+}
+
 func initRouter() *gin.Engine {
 	router := gin.Default()
 
 	api := router.Group("/api/v1")
 	{
+		router.GET("/", Ping)
 		auth := api.Group("/auth")
 		{
 			auth.POST("/login", controllers.GenerateToken)
