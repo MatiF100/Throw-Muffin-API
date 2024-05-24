@@ -33,7 +33,7 @@ func main() {
 
 	router := initRouter()
 
-	router.Run(":8080")
+	router.Run("0.0.0.0:8080")
 }
 
 func Ping(context *gin.Context) {
