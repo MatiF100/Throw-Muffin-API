@@ -67,6 +67,9 @@ func initRouter() *gin.Engine {
 	// programmatically set swagger info
 	docs.SwaggerInfo.Title = "ThrowMuffin swagger API"
 	docs.SwaggerInfo.Description = "API for ThrowMuffin frontend"
+	if env.Get("GIN_MODE", "") != "" {
+		docs.SwaggerInfo.Host = "throwmuffinxapi.azurewebsites.net"
+	}
 	docs.SwaggerInfo.Version = "1.0"
 	docs.SwaggerInfo.BasePath = "/api/v1"
 	docs.SwaggerInfo.Schemes = []string{"http", "https"}

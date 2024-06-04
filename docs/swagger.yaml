@@ -117,7 +117,7 @@ paths:
           description: Unauthorized
       summary: Ping
       tags:
-      - diagnostic
+      - Diagnostic
 securityDefinitions:
   BasicAuth:
     type: basic
