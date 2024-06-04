@@ -48,9 +48,15 @@ type App struct {
 func main() {
 	var app App = App{}
 
+	watcher, err := fsnotify.NewWatcher()
+	if err != nil {
+		fmt.Println("ERROR", err)
+	}
+	defer watcher.Close()
+
 	setup_env(&app)
 	setup_db(&app)
-	setup_azure(&app)
+	setup_azure(&app, watcher)
 
 	router := initRouter()
 
@@ -109,13 +115,8 @@ func setup_db(app *App) {
 	database.Migrate()
 }
 
-func setup_azure(app *App) {
+func setup_azure(app *App, watcher *fsnotify.Watcher) {
 	// creates a new file watcher for App_offline.htm
-	watcher, err := fsnotify.NewWatcher()
-	if err != nil {
-		fmt.Println("ERROR", err)
-	}
-	defer watcher.Close()
 
 	// watch for App_offline.htm and exit the program if present
 	// This allows continuous deployment on App Service as the .exe will not be
@@ -134,6 +135,10 @@ func setup_azure(app *App) {
 
 	// get the current working directory and watch it
 	currentDir, err := os.Getwd()
+	if err != nil {
+		fmt.Println("ERROR", err)
+	}
+
 	if err := watcher.Add(currentDir); err != nil {
 		fmt.Println("ERROR", err)
 	}
