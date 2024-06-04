@@ -12,6 +12,17 @@ type TokenRequest struct {
 	Password string `json:"password"`
 }
 
+// RefreshTocken godoc
+// @Summary      Token generation
+// @Description  Generate authentication token
+// @Tags         Auth
+// @Param        request   body      TokenRequest  true  "Token request"
+// @Produce      json
+// @Failure  	 400
+// @Failure  	 401
+// @Failure  	 500
+// @Success 	 200
+// @Router       /auth/login [post]
 func GenerateToken(context *gin.Context) {
 	var request TokenRequest
 	var user models.User
@@ -23,7 +34,7 @@ func GenerateToken(context *gin.Context) {
 
 	record := database.Instance.Where("email = ?", request.Email).First(&user)
 	if record.Error != nil {
-		context.JSON(401, gin.H{"error": "User not found"})
+		context.JSON(404, gin.H{"error": "User not found"})
 		context.Abort()
 		return
 	}
@@ -49,6 +60,17 @@ type RefreshTokenRequest struct {
 	RefreshToken string `json:"refresh_token"`
 }
 
+// RefreshToken godoc
+// @Summary      Token generation
+// @Description  Generate authentication token
+// @Tags         Auth
+// @Param        request   body      RefreshTokenRequest  true  "Refrest Token request"
+// @Produce      json
+// @Failure  	 400
+// @Failure  	 401
+// @Failure  	 500
+// @Success 	 200
+// @Router       /auth/refresh-token [post]
 func RefreshToken(context *gin.Context) {
 	var request RefreshTokenRequest
 

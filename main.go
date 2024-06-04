@@ -15,6 +15,10 @@ import (
 	"github.com/gofor-little/env"
 
 	_ "github.com/lib/pq"
+
+	"github.com/MatiF100/Throw-Muffin-API/docs"
+	swaggerFiles "github.com/swaggo/files" // swagger embed files
+	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
 type App struct {
@@ -22,6 +26,25 @@ type App struct {
 	local_mode bool
 }
 
+// @title           Swagger Example API
+// @version         1.0
+// @description     This is a sample server celler server.
+// @termsOfService  http://swagger.io/terms/
+
+// @contact.name   API Support
+// @contact.url    http://www.swagger.io/support
+// @contact.email  support@swagger.io
+
+// @license.name  Apache 2.0
+// @license.url   http://www.apache.org/licenses/LICENSE-2.0.html
+
+// @host      localhost:8080
+// @BasePath  /api/v1
+
+// @securityDefinitions.basic  BasicAuth
+
+// @externalDocs.description  OpenAPI
+// @externalDocs.url          https://swagger.io/resources/open-api/
 func main() {
 	var app App = App{}
 
@@ -41,6 +64,13 @@ func Ping(context *gin.Context) {
 func initRouter() *gin.Engine {
 	router := gin.Default()
 
+	// programmatically set swagger info
+	docs.SwaggerInfo.Title = "ThrowMuffin swagger API"
+	docs.SwaggerInfo.Description = "API for ThrowMuffin frontend"
+	docs.SwaggerInfo.Version = "1.0"
+	docs.SwaggerInfo.BasePath = "/api/v1"
+	docs.SwaggerInfo.Schemes = []string{"http", "https"}
+
 	api := router.Group("/api/v1")
 	{
 		router.GET("/", Ping)
@@ -56,6 +86,8 @@ func initRouter() *gin.Engine {
 			secured.GET("/ping", controllers.Ping)
 		}
 	}
+
+	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	return router
 }
