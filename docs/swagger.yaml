@@ -115,10 +115,14 @@ paths:
       responses:
         "401":
           description: Unauthorized
+      security:
+      - ApiKeyAuth: []
       summary: Ping
       tags:
       - Diagnostic
 securityDefinitions:
-  BasicAuth:
-    type: basic
+  ApiKeyAuth:
+    in: header
+    name: Authorization
+    type: apiKey
 swagger: "2.0"

@@ -9,6 +9,7 @@ import "github.com/gin-gonic/gin"
 // @Produce      json
 // @Failure  	 401
 // @Router       /ping [get]
+// @Security ApiKeyAuth
 func Ping(context *gin.Context) {
 	context.JSON(200, gin.H{"message": "pong"})
 }
