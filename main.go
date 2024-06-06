@@ -17,6 +17,8 @@ import (
 	_ "github.com/lib/pq"
 
 	"github.com/MatiF100/Throw-Muffin-API/docs"
+	"github.com/gin-contrib/cors"
+
 	swaggerFiles "github.com/swaggo/files" // swagger embed files
 	ginSwagger "github.com/swaggo/gin-swagger"
 )
@@ -71,6 +73,11 @@ func Ping(context *gin.Context) {
 
 func initRouter() *gin.Engine {
 	router := gin.Default()
+
+	config := cors.DefaultConfig()
+
+	config.AllowOrigins = []string{"http://localhost", "https://localhost", "https://throwmuffinxapi.azurewebsites.net/"}
+	router.Use(cors.New(config))
 
 	// programmatically set swagger info
 	docs.SwaggerInfo.Title = "ThrowMuffin swagger API"
