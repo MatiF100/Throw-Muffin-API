@@ -76,7 +76,8 @@ func initRouter() *gin.Engine {
 
 	config := cors.DefaultConfig()
 
-	config.AllowOrigins = []string{"http://localhost", "https://localhost", "https://throwmuffinxapi.azurewebsites.net/"}
+	//config.AllowOrigins = []string{"http://localhost", "https://localhost", "https://throwmuffinxapi.azurewebsites.net/"}
+	config.AllowAllOrigins = true
 	router.Use(cors.New(config))
 
 	// programmatically set swagger info
