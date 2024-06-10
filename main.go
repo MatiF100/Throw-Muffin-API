@@ -103,6 +103,14 @@ func initRouter() *gin.Engine {
 		secured := api.Group("").Use(middlewares.Auth())
 		{
 			secured.GET("/ping", controllers.Ping)
+
+			workout := api.Group("/workout")
+			{
+				workout.GET("/:userId/:id", controllers.FetchWorkout)
+				workout.GET("/:userId/all", controllers.GetWorkoutPlanList)
+				workout.POST("/:userId/generate", controllers.GenerateWorkoutPlan)
+			}
+
 		}
 	}
 
