@@ -1,7 +1,7 @@
 package middlewares
 
 import (
-	"github.com/MatiF100/Throw-Muffin-API/auth"
+	tokenService "github.com/MatiF100/Throw-Muffin-API/services"
 	"github.com/gin-gonic/gin"
 )
 
@@ -15,7 +15,7 @@ func Auth() gin.HandlerFunc {
 			return
 		}
 		tokenString := authorizationHeader[prefix_len:]
-		_, err := auth.ValidateToken(tokenString)
+		_, err := tokenService.ValidateToken(tokenString)
 		if err != nil {
 			context.JSON(401, gin.H{"error": err.Error()})
 			context.Abort()

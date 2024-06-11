@@ -1,9 +1,9 @@
 package controllers
 
 import (
-	"github.com/MatiF100/Throw-Muffin-API/auth"
 	"github.com/MatiF100/Throw-Muffin-API/database"
 	"github.com/MatiF100/Throw-Muffin-API/models"
+	tokenService "github.com/MatiF100/Throw-Muffin-API/services"
 	"github.com/gin-gonic/gin"
 )
 
@@ -46,7 +46,7 @@ func GenerateToken(context *gin.Context) {
 		return
 	}
 
-	accessToken, refreshToken, err := auth.GenerateTokenPair(user.Email, user.Username)
+	accessToken, refreshToken, err := tokenService.GenerateTokenPair(user.ID.String())
 	if err != nil {
 		context.JSON(500, gin.H{"error": "Error generating token"})
 		context.Abort()
@@ -79,14 +79,14 @@ func RefreshToken(context *gin.Context) {
 		return
 	}
 
-	token, err := auth.ValidateToken(request.RefreshToken)
+	token, err := tokenService.ValidateToken(request.RefreshToken)
 	if err != nil {
 		context.JSON(401, gin.H{"error": err.Error()})
 		context.Abort()
 		return
 	}
 
-	claims, ok := token.Claims.(*auth.JWTClaim)
+	claims, ok := token.Claims.(*tokenService.UserClaims)
 	// Can theoraically never happen since we already validated the token
 	// maybe ValidateToken should return the claims instead of the token
 	if !ok {
@@ -96,7 +96,7 @@ func RefreshToken(context *gin.Context) {
 	}
 
 	// Generate new access token with the same claims
-	accessToken, refreshToken, err := auth.GenerateTokenPair(claims.Email, claims.Username)
+	accessToken, refreshToken, err := tokenService.GenerateTokenPair(claims.UserId)
 	if err != nil {
 		context.JSON(500, gin.H{"error": "Error generating token"})
 		context.Abort()
