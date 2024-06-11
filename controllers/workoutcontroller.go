@@ -13,7 +13,7 @@ import (
 )
 
 type WorkoutPlanDetails struct {
-	Excercises  []models.Excercise
+	Excercises  []*models.Excercise
 	DateCreated time.Time
 }
 
@@ -24,10 +24,10 @@ type WorkoutPlanDetails struct {
 // @Failure  	 400
 // @Failure  	 500
 // @Success 	 200
-// @Router       /workout/:userId/generate [post]
+// @Router       /workout/generate [post]
 // @Security ApiKeyAuth
 func GenerateWorkoutPlan(context *gin.Context) {
-	var excerciseList []models.Excercise
+	var excerciseList []*models.Excercise
 	result := database.Instance.Order("RANDOM()").Limit((rand.Int()%3 + 5)).Find(&excerciseList)
 	if result.Error != nil {
 		log.Printf("Error: %v", result.Error)
@@ -37,11 +37,11 @@ func GenerateWorkoutPlan(context *gin.Context) {
 	token := tokenService.ParseAccessToken(strings.TrimPrefix(tokenString, "Bearer "))
 
 	workout := models.Workout{
-		Excercises: excerciseList,
 		UserId:     token.UserId,
+		Excercises: excerciseList,
 	}
 
-	record := database.Instance.Create(&workout)
+	record := database.Instance.Omit("Excercises.*").Save(&workout)
 	if record.Error != nil {
 		context.JSON(400, gin.H{"error": record.Error})
 		context.Abort()

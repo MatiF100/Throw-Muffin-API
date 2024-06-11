@@ -153,7 +153,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/workout/:userId/generate": {
+        "/workout/generate": {
             "post": {
                 "security": [
                     {

@@ -120,7 +120,7 @@ paths:
       summary: Ping
       tags:
       - Diagnostic
-  /workout/:userId/generate:
+  /workout/generate:
     post:
       produces:
       - application/json
