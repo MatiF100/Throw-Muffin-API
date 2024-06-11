@@ -120,6 +120,44 @@ paths:
       summary: Ping
       tags:
       - Diagnostic
+  /workout/{uuid}:
+    get:
+      parameters:
+      - description: Workout ID
+        in: path
+        name: uuid
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+        "500":
+          description: Internal Server Error
+      security:
+      - ApiKeyAuth: []
+      summary: Fetch single workout info
+      tags:
+      - Workout
+  /workout/all:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+        "500":
+          description: Internal Server Error
+      security:
+      - ApiKeyAuth: []
+      summary: Get all generated workout plans
+      tags:
+      - Workout
   /workout/generate:
     post:
       produces:

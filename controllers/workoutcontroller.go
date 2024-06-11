@@ -13,8 +13,17 @@ import (
 )
 
 type WorkoutPlanDetails struct {
-	Excercises  []*models.Excercise
+	Excercises  []*ExcerciseDetails
 	DateCreated time.Time
+	Id          string
+	UserId      string
+}
+
+type ExcerciseDetails struct {
+	Id           string
+	Name         string
+	Category     string
+	Instructions string
 }
 
 // GenerateWorkout godoc
@@ -48,16 +57,84 @@ func GenerateWorkoutPlan(context *gin.Context) {
 		return
 	}
 
-	context.JSON(200, WorkoutPlanDetails{Excercises: workout.Excercises, DateCreated: workout.CreatedAt})
+	response := WorkoutPlanDetails{
+		Excercises:  make([]*ExcerciseDetails, len(excerciseList)),
+		DateCreated: workout.CreatedAt,
+		UserId:      workout.UserId,
+		Id:          workout.ID.String(),
+	}
+
+	for i, excercise := range excerciseList {
+		response.Excercises[i] = &ExcerciseDetails{
+			Id:           excercise.ID.String(),
+			Category:     excercise.Category,
+			Name:         excercise.Name,
+			Instructions: excercise.Instructions,
+		}
+	}
+
+	context.JSON(200, response)
 
 }
 
+// GetWorkouts godoc
+// @Summary      Get all generated workout plans
+// @Tags         Workout
+// @Produce      json
+// @Failure  	 400
+// @Failure  	 500
+// @Success 	 200
+// @Router       /workout/all [get]
+// @Security ApiKeyAuth
 func GetWorkoutPlanList(context *gin.Context) {
+	tokenString := context.GetHeader("Authorization")
+	token := tokenService.ParseAccessToken(strings.TrimPrefix(tokenString, "Bearer "))
+
+	var workouts []*models.Workout
+	record := database.Instance.Model(&models.Workout{}).Preload("Excercises").Where("user_id = ?", token.UserId).Find(&workouts)
+	if record.Error != nil {
+		context.JSON(400, gin.H{"error": record.Error})
+		context.Abort()
+		return
+	}
+
+	response := make([]*WorkoutPlanDetails, len(workouts))
+
+	for i, plan := range workouts {
+		response[i] = &WorkoutPlanDetails{
+			DateCreated: plan.CreatedAt,
+			UserId:      token.UserId,
+			Id:          plan.ID.String(),
+			Excercises:  make([]*ExcerciseDetails, len(plan.Excercises)),
+		}
+
+		for j, excercise := range plan.Excercises {
+			response[i].Excercises[j] = &ExcerciseDetails{
+				Id:           excercise.ID.String(),
+				Category:     excercise.Category,
+				Name:         excercise.Name,
+				Instructions: excercise.Instructions,
+			}
+		}
+
+	}
+
+	context.JSON(200, response)
 }
 
+// Fetch workout godoc
+// @Summary      Fetch single workout info
+// @Tags         Workout
+// @Param        uuid   path      string  true  "Workout ID"
+// @Produce      json
+// @Failure  	 400
+// @Failure  	 500
+// @Success 	 200
+// @Router       /workout/{uuid} [get]
+// @Security ApiKeyAuth
 func FetchWorkout(context *gin.Context) {
-	authorizationHeader := context.GetHeader("Authorization")
-	token := tokenService.ParseAccessToken(authorizationHeader)
+	tokenString := context.GetHeader("Authorization")
+	token := tokenService.ParseAccessToken(strings.TrimPrefix(tokenString, "Bearer "))
 
 	workoutId, err := context.Params.Get("id")
 	if !err {
@@ -66,13 +143,28 @@ func FetchWorkout(context *gin.Context) {
 	}
 
 	var workout models.Workout
-	record := database.Instance.First(&workout, "id = ? and userid = ?", workoutId, token.UserId)
+	record := database.Instance.Model(&models.Workout{}).Preload("Excercises").First(&workout, "id = ? and user_id = ?", workoutId, token.UserId)
 	if record.Error != nil {
 		context.JSON(400, gin.H{"error": record.Error})
 		context.Abort()
 		return
 	}
 
-	context.JSON(200, workout)
+	response := WorkoutPlanDetails{
+		Excercises:  make([]*ExcerciseDetails, len(workout.Excercises)),
+		DateCreated: workout.CreatedAt,
+		UserId:      workout.UserId,
+		Id:          workout.ID.String(),
+	}
+
+	for i, excercise := range workout.Excercises {
+		response.Excercises[i] = &ExcerciseDetails{
+			Id:           excercise.ID.String(),
+			Category:     excercise.Category,
+			Name:         excercise.Name,
+			Instructions: excercise.Instructions,
+		}
+	}
+	context.JSON(200, response)
 
 }
