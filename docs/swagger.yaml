@@ -2,10 +2,8 @@ basePath: /api/v1
 definitions:
   controllers.GeneratePlanRequest:
     properties:
-      bodyparts:
-        items:
-          type: string
-        type: array
+      bodypart:
+        type: string
     type: object
   controllers.RefreshTokenRequest:
     properties:

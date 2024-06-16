@@ -27,7 +27,7 @@ type ExcerciseDetails struct {
 }
 
 type GeneratePlanRequest struct {
-	Bodyparts []string `json:"bodyparts"`
+	Bodypart string `json:"bodypart"`
 }
 
 // GenerateWorkout godoc
@@ -48,7 +48,7 @@ func GenerateWorkoutPlan(context *gin.Context) {
 	}
 
 	var excerciseList []*models.Excercise
-	result := database.Instance.Order("RANDOM()").Where("category IN ?", requestDetails.Bodyparts).Limit((rand.Int()%3 + 5)).Find(&excerciseList)
+	result := database.Instance.Order("RANDOM()").Where("category ILIKE ?", requestDetails.Bodypart).Limit((rand.Int()%3 + 5)).Find(&excerciseList)
 	if result.Error != nil {
 		log.Printf("Error: %v", result.Error)
 	}

@@ -259,11 +259,8 @@ const docTemplate = `{
         "controllers.GeneratePlanRequest": {
             "type": "object",
             "properties": {
-                "bodyparts": {
-                    "type": "array",
-                    "items": {
-                        "type": "string"
-                    }
+                "bodypart": {
+                    "type": "string"
                 }
             }
         },
