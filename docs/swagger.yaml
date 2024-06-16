@@ -1,5 +1,12 @@
 basePath: /api/v1
 definitions:
+  controllers.GeneratePlanRequest:
+    properties:
+      bodyparts:
+        items:
+          type: string
+        type: array
+    type: object
   controllers.RefreshTokenRequest:
     properties:
       refresh_token:
@@ -160,6 +167,13 @@ paths:
       - Workout
   /workout/generate:
     post:
+      parameters:
+      - description: User expectations
+        in: body
+        name: details
+        required: true
+        schema:
+          $ref: '#/definitions/controllers.GeneratePlanRequest'
       produces:
       - application/json
       responses:

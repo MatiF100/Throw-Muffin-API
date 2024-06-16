@@ -194,6 +194,17 @@ const docTemplate = `{
                     "Workout"
                 ],
                 "summary": "Generate workout plan",
+                "parameters": [
+                    {
+                        "description": "User expectations",
+                        "name": "details",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/controllers.GeneratePlanRequest"
+                        }
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK"
@@ -245,6 +256,17 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "controllers.GeneratePlanRequest": {
+            "type": "object",
+            "properties": {
+                "bodyparts": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                }
+            }
+        },
         "controllers.RefreshTokenRequest": {
             "type": "object",
             "properties": {

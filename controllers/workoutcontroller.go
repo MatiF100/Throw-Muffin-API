@@ -26,9 +26,14 @@ type ExcerciseDetails struct {
 	Instructions string
 }
 
+type GeneratePlanRequest struct {
+	Bodyparts []string `json:"bodyparts"`
+}
+
 // GenerateWorkout godoc
 // @Summary      Generate workout plan
 // @Tags         Workout
+// @Param        details   body      GeneratePlanRequest  true  "User expectations"
 // @Produce      json
 // @Failure  	 400
 // @Failure  	 500
@@ -36,10 +41,22 @@ type ExcerciseDetails struct {
 // @Router       /workout/generate [post]
 // @Security ApiKeyAuth
 func GenerateWorkoutPlan(context *gin.Context) {
+	var requestDetails GeneratePlanRequest
+	if err := context.ShouldBindJSON(&requestDetails); err != nil {
+		context.JSON(400, gin.H{"error": err.Error()})
+		return
+	}
+
 	var excerciseList []*models.Excercise
-	result := database.Instance.Order("RANDOM()").Limit((rand.Int()%3 + 5)).Find(&excerciseList)
+	result := database.Instance.Order("RANDOM()").Where("category IN ?", requestDetails.Bodyparts).Limit((rand.Int()%3 + 5)).Find(&excerciseList)
 	if result.Error != nil {
 		log.Printf("Error: %v", result.Error)
+	}
+
+	if len(excerciseList) == 0 {
+		context.JSON(404, gin.H{"error": "No excercises found! Please change your criteria and try again"})
+		context.Abort()
+		return
 	}
 
 	tokenString := context.GetHeader("Authorization")
